@@ -65,25 +65,23 @@ struct s_cmd_node *next;
 // } t_exec;
 
 	
-typedef enum e_token_type
-{
-    command,
-    arg,
-    token_pipe,
-    rid_in,
-    rid_out,
-    hered,
-    red_append,
-}   t_token_type;
+typedef enum e_token_type {
+	ARG,
+	RID_IN,
+	RID_OUT,
+	RED_APPEND,
+	HERED,
+	TOKEN_PIPE
+}	t_token_type;
 
-typedef struct node{
-    char *token;
-    int n;
-    struct node *next;
-    struct s_cmd_node *info_node;
-   // int pipe_exit =0 ;
-    t_token_type type;
-} t_node;
+typedef struct s_node {
+	char *token;
+	int group;
+	t_token_type type;
+	struct s_cmd_node *info_node;
+	struct s_node *next;
+}	t_node;
+
 void error_msg(char *s,t_node *head);
 char * get_next_line(int fd);
 void skipswhiteSpaces(char **input);

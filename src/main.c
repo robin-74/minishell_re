@@ -106,12 +106,10 @@ void assign_groups(t_node *head,int group)
     {
         if (head->type == TOKEN_PIPE)
         {
-            while(head->type == TOKEN_PIPE)
-                head = head->next;
+           // printf("fount a pipe");
             group_id++;
         }
-        else
-            head->group = group_id;
+        head->group = group_id;
         head = head->next;
     }
 }
@@ -135,6 +133,25 @@ void print_token_list(t_node *head)
 			head->token,  head->group);
 		head = head->next;
 	}
+}
+
+
+void group_by_group(t_cmd_node *cmd_head,t_node *head)
+{
+    t_cmd_node *temp;
+    cmd_head = init_cmd_node();
+    int priv = 0;
+    while(*head)
+    {
+        while(head->group == priv && *head)
+        {
+            cmd_head->node_list.append(head);
+        };
+        if(!*head)
+            return ;
+        head = head->next;
+        cmd_head = cmd_head->next;
+    }
 }
 
 int main(void)
@@ -165,7 +182,8 @@ int main(void)
         identify_node_types(head);
         assign_groups(head,group);
         print_token_list(head);
-
+        t_cmd_node *cmd_node ;
+        group_by_group(cmd_node,head);
         free(input);
         input = NULL;
     }

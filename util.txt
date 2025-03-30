@@ -1,0 +1,26 @@
+void print_token_list(t_node *head)
+{
+    while (head)
+    {
+        printf("Token: %s  | Group: %d\n", head->token, head->group);
+        head = head->next;
+    }
+}
+void print_cmd_list(t_cmd_node *cmd_head)
+{
+    int cmd_index = 1;
+    while (cmd_head)
+    {
+        printf("Command Group %d:\n", cmd_index);
+        t_node *current = cmd_head->node_list;
+        while (current)
+        {
+            printf("  Token: %s | Type: %d | Group: %d\n", current->token, current->type, current->group);
+            if (!current->next || current->group != current->next->group)
+                break; // Stop at the end of the group
+            current = current->next;
+        }
+        cmd_head = cmd_head->next;
+        cmd_index++;
+    }
+}

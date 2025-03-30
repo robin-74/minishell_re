@@ -99,67 +99,70 @@ void identify_node_types(t_node *head)
     }
 }
 
-void assign_groups(t_node *head,int group)
+void assign_groups(t_node *head, int group)
 {
     int group_id = group;
     while (head)
     {
         if (head->type == TOKEN_PIPE)
-        {
-           // printf("fount a pipe");
             group_id++;
-        }
         head->group = group_id;
         head = head->next;
     }
 }
 
-const char *type_to_string(t_token_type type)
+t_cmd_node *init_cmd_node()
 {
-    if (type == ARG) return "ARG";
-    if (type == RID_IN) return "IN";
-    if (type == RID_OUT) return "OUT";
-    if (type == RED_APPEND) return "APPEND";
-    if (type == HERED) return "HEREDOC";
-    if (type == TOKEN_PIPE) return "PIPE";
-    return "UNKNOWN";
+    t_cmd_node *new_cmd = malloc(sizeof(t_cmd_node));
+    if (!new_cmd)
+        return NULL;
+    new_cmd->arr = NULL;
+    new_cmd->in = NULL;
+    new_cmd->out = NULL;
+    new_cmd->heredoc = NULL;
+    new_cmd->append = 0;
+    new_cmd->err = 0;
+    new_cmd->ex_heredoc = 0;
+    new_cmd->node_list = NULL;
+    new_cmd->next = NULL;
+    return new_cmd;
 }
 
-void print_token_list(t_node *head)
+void group_by_group(t_cmd_node **cmd_head, t_node *head)
 {
-	while (head)
-	{
-		printf("Token: %s  | Group: %d\n",
-			head->token,  head->group);
-		head = head->next;
-	}
-}
-
-
-void group_by_group(t_cmd_node *cmd_head,t_node *head)
-{
-    t_cmd_node *temp;
-    cmd_head = init_cmd_node();
-    int priv = 0;
-    while(*head)
+    t_cmd_node *temp = NULL;
+    int prev_group = -1;
+    
+    while (head)
     {
-        while(head->group == priv && *head)
+        if (head->group != prev_group)
         {
-            cmd_head->node_list.append(head);
-        };
-        if(!*head)
-            return ;
+            t_cmd_node *new_cmd = init_cmd_node();
+            if (!new_cmd)
+                return;
+            
+            if (!*cmd_head)
+                *cmd_head = new_cmd;
+            else
+                temp->next = new_cmd;
+            
+            temp = new_cmd;
+            temp->node_list = head;
+            prev_group = head->group;
+        }
         head = head->next;
-        cmd_head = cmd_head->next;
     }
 }
+
+
 
 int main(void)
 {
     char *input = NULL;
     size_t len = 0;
     ssize_t nr;
-    int group = 0 ;
+    int group = 0;
+
     while (1)
     {
         printf("\nminishell>> ");
@@ -180,10 +183,12 @@ int main(void)
 
         t_node *head = to_linked_list(input);
         identify_node_types(head);
-        assign_groups(head,group);
+        assign_groups(head, group);
         print_token_list(head);
-        t_cmd_node *cmd_node ;
-        group_by_group(cmd_node,head);
+        
+        t_cmd_node *cmd_node = NULL;
+        group_by_group(&cmd_node, head);
+        print_cmd_list(cmd_node);
         free(input);
         input = NULL;
     }

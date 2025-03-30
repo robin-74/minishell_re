@@ -46,18 +46,7 @@
 // struct s_env_var *prev;
 // } t_env_var;
 
-typedef struct s_cmd_node {
-char **arr;
-char *in;
-char *out;
-//t_type type;
-char *heredoc;
-int append;
-int err;
-int ex_heredoc;
-t_node *node_list;
-struct s_cmd_node *next;
-} t_cmd_node;
+
 
 // typedef struct s_exec{
 // t_cmd_node *cmd_list;
@@ -82,6 +71,19 @@ typedef struct s_node {
 	struct s_cmd_node *info_node;
 	struct s_node *next;
 }	t_node;
+
+typedef struct s_cmd_node {
+    char **arr;
+    char *in;
+    char *out;
+    //t_type type;
+    char *heredoc;
+    int append;
+    int err;
+    int ex_heredoc;
+    t_node *node_list;
+    struct s_cmd_node *next;
+    } t_cmd_node;
 
 void error_msg(char *s,t_node *head);
 char * get_next_line(int fd);

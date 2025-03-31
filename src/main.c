@@ -153,8 +153,81 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
         head = head->next;
     }
 }
+int white_space(char a)
+{
+    if(a == ' ' || a == 't' || a == '\n')
+        return 1;
+    return 0;
+}
+int is_redirection(char *a)
+{
+    if(str_length(a) > 2)
+        return -1;
+    if(ft_strcmp(a,'>'))
+        return 1;
+    else if(ft_strcmp(a,'<'))
+        return 2;
+    else if(ft_strcmp(a,'>>'))
+        return 11;
+    else if (ft_strcmp(a,'<<'))
+        return 22;
+    return -1;
+}
+// scenario 1 : 
+//     ho 1 in 1 eza mana redierction we fill it in a 2d arry //handle the file houwe awal agr ba3ed lrediction w function fill it 
+void ...//
+{
+    t_cmd_node* cmd_head;
+    t_node *head ;
+    while(*cmd_head)
+    {
+        while(*cmd_head->node)
+        {
 
+            if(is_redirection(node->token) == -1)
+            {
+                *cmd_node->arr = malloc((char *) * sizeof(node->token))
+                *(cmd_node-arr)++;
 
+            }
+            else{
+                if (is_redirection(node->token == 2))
+                {
+                    *cmd_head->node = cmd->head->node->next;
+                    *cmd_node->node->in =cmd_node->node->token;
+                }
+                else if(is_redirection(node->token == 22))
+                {
+                    *cmd_head->node = cmd->head->node->next;
+                    *cmd_node->node->heredoc =cmd_node->node->token;
+                }
+                else if(is_redirection(node->token == 1))
+                {
+                    *cmd_head->node = cmd->head->node->next;
+                    *cmd_node->node->out =cmd_node->node->token;
+                }
+                else if(is_redirection(node->token == 11))
+                {
+                   //add ot the struct .....
+
+                }
+                //handle append to the file //deffer from in not from scartch it init them 
+            }
+        }
+        cmd_head = cmd_head->next;
+    }
+}
+void handle_redirection(t_node *head,t_cmd_node *head)
+{
+    while(*head && *cmd_head)
+    {
+        if(ft_strcmp(head->token, '>'))
+        {
+            //there a file name put it 
+            while()
+        }
+    }
+}
 
 int main(void)
 {
@@ -184,11 +257,12 @@ int main(void)
         t_node *head = to_linked_list(input);
         identify_node_types(head);
         assign_groups(head, group);
-        print_token_list(head);
-        
+        // print_token_list(head);
+        clean_node(head);
         t_cmd_node *cmd_node = NULL;
         group_by_group(&cmd_node, head);
-        print_cmd_list(cmd_node);
+        // print_cmd_list(cmd_node);
+        //handle_herdocs(head);
         free(input);
         input = NULL;
     }

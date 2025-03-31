@@ -76,11 +76,11 @@ typedef struct s_cmd_node {
     char **arr;
     char *in;
     char *out;
-    //t_type type;
-    char *heredoc;
-    int append;
     int err;
-    int ex_heredoc;
+    //t_type type;
+    char *heredoc;//<<
+    int append;//>>
+
     t_node *node_list;
     struct s_cmd_node *next;
     } t_cmd_node;

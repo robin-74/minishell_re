@@ -37,14 +37,14 @@
 // //split aa ases li aam bekhdo bel env w asemo la 3 parts 1 the key
 // //2 the boolean eza le2a = aw lae
 // //3 the value li after the =
-// typedef struct s_env_var {
-// char *key;
-// bool equal;
-// char *value;
-// char *all;
-// struct s_env_var *next;
-// struct s_env_var *prev;
-// } t_env_var;
+typedef struct s_env_var {
+char *key;
+bool equal;
+char *value;
+char *all;
+struct s_env_var *next;
+struct s_env_var *prev;
+} t_env_var;
 
 
 
@@ -54,7 +54,12 @@
 // int exit_status;
 // } t_exec;
 
-	
+
+typedef struct p_node
+{
+	char **env-list;
+} p_node;
+
 typedef enum e_token_type {
 	ARG,
 	RID_IN,
@@ -74,13 +79,14 @@ typedef struct s_node {
 
 typedef struct s_cmd_node {
     char **arr;
-    char *in;
-    char *out;
-    int err;
+    char *in;  // < filename  <in>
+    char *out; // >
+    int err; //~
     //t_type type;
     char *heredoc;//<<
+	int ex_heredoc;
     int append;//>>
-
+	t_env_var *env;
     t_node *node_list;
     struct s_cmd_node *next;
     } t_cmd_node;

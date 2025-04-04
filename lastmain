@@ -1,3 +1,6 @@
+
+
+
 #include "../minishell.h"
 
 int str_length(char *input)
@@ -132,7 +135,7 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
 {
     t_cmd_node *temp = NULL;
     int prev_group = -1;
-
+    
     while (head)
     {
         if (head->group != prev_group)
@@ -140,12 +143,12 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
             t_cmd_node *new_cmd = init_cmd_node();
             if (!new_cmd)
                 return;
-
+            
             if (!*cmd_head)
                 *cmd_head = new_cmd;
             else
                 temp->next = new_cmd;
-
+            
             temp = new_cmd;
             temp->node_list = head;
             prev_group = head->group;
@@ -153,7 +156,12 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
         head = head->next;
     }
 }
-
+int white_space(char a)
+{
+    if(a == ' ' || a == 't' || a == '\n')
+        return 1;
+    return 0;
+}
 int is_redirection(char *a)
 {
     if (!a || str_length(a) > 2)
@@ -222,89 +230,8 @@ void fill_herdock(t_cmd_node *cmd_head)
     }
 }
 
-void clean_node(t_node *head)
-{
-    t_node *tmp;
-    while (head)
-    {
-        tmp = head->next;
-        free(head->token);
-        free(head);
-        head = tmp;
-    }
-}
-
-void hadnle quotation and double qutoation;
-
-
-void handle_dollar(int flag ,t_cmd_node *cmd_head,t_node *head)
-{
-    if(!flag)
-    {
-        //eza fi 1 qutation no expend 
-        printit as a str do nothing
-        return;  
-    };
-    //search where theiur $ chouf eza bdk ta3mel expend replace the $HOME with the value exepended  sol 1 ) 
-    //iterrate over the tokens ya3ne bil arr till we enounter a $
-}
-
-//handle $ use flag is kenet on we should expetdn 
-   // run the function of the expend search for env path and search for world in the input l2ita skip = and add kel chi next to it 
  
-char *handle_expand(t_cmd_node *cmd_node)
-{
-    int i =0 ;
-    int j = 0 ;
-    int number_pid =0 ; 
-    char **arr = cmd_node->arr;
-    int pid = (int)getpid();
-    int n = 0 ;
-    while(arr[i])
-    {
-        while(arr[i][j])
-        {
-            if (arr[i][j] == '$')
-            {
-                j++;
-                while(arr[i][j] == '$')
-                    number_pid++;
-                char *expand = get_from_env(cmd_node->env )
-                if (*expand != NULL)
-                {
-                    //create a new string add number of even$$ replae them wiht pid fro each $$ 1pid like $$$$ we have pidpid (if pid = 9 - > 99)
-                    int pid_length  = sizeof_int(pid);
-                    int n_pid  = number_pid/2;
-                    if(n_pid *2 != number_pid)
-                        n++;
-                    char *new_arr = (char *)(malloc(sizeof(char *) *expand + n +n_pid));
-                    
 
-                }
-            }
-            j++;
-        }
-        i++;
-    }
-
-}
-
-
-void print_in(t_cmd_node* cmd)
-{
-     if(cmd->in)
-     {
-        printf("in : %s \n",cmd->in);
-     }
-     else
-        printf("NULLL \n");
-     if(cmd->out)
-     {
-        printf("out : %s \n",cmd->out);
-     }
-     else
-        printf("NULLL \n");
-}
 int main(void)
 {
     char *input = NULL;
@@ -333,15 +260,16 @@ int main(void)
         t_node *head = to_linked_list(input);
         identify_node_types(head);
         assign_groups(head, group);
+        // print_token_list(head);
+        clean_node(head);
         t_cmd_node *cmd_node = NULL;
         group_by_group(&cmd_node, head);
+        // print_cmd_list(cmd_node);
+        //handle_herdocs(head);
         fill_herdock(cmd_node);
-        print_in(cmd_node);
-        clean_node(head);
         free(input);
         input = NULL;
     }
 
     return 0;
 }
-

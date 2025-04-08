@@ -1,7 +1,9 @@
 #include "ft_printf/ft_printf.h"
+#include "stack/push_swap.h"
 #include "libft/libft.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 // typedef struct s_prompt
 // {
 //     t_list *cmds; //linked list of cmd each node fiya s_mini
@@ -54,6 +56,11 @@
 // int exit_status;
 // } t_exec;
 
+typedef enum e_quote_type{
+    ZERO_QUOTES,
+    ONE_QUOTES,
+    DOUBLE_QUOTES
+} t_quote_type;
 	
 typedef enum e_token_type {
 	ARG,
@@ -68,9 +75,11 @@ typedef struct s_node {
 	char *token;
 	int group;
 	t_token_type type;
+    t_quote_type quote_type;
 	struct s_cmd_node *info_node;
 	struct s_node *next;
 }	t_node;
+
 
 typedef struct s_cmd_node {
     char **arr;
@@ -82,6 +91,7 @@ typedef struct s_cmd_node {
     int err;
     int ex_heredoc;
     t_node *node_list;
+    bool expand ;
     struct s_cmd_node *next;
     } t_cmd_node;
 

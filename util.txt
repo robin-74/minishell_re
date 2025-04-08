@@ -24,3 +24,31 @@ void print_cmd_list(t_cmd_node *cmd_head)
         cmd_index++;
     }
 }
+
+void print_cmd_node(t_cmd_node *cmd)
+{
+    while (cmd)
+    {
+        printf("\n===== COMMAND NODE =====\n");
+        printf("in      : %s\n", cmd->in ? cmd->in : "NULL");
+        printf("out     : %s\n", cmd->out ? cmd->out : "NULL");
+        printf("heredoc : %s\n", cmd->heredoc ? cmd->heredoc : "NULL");
+        printf("append  : %d\n", cmd->append);
+
+        printf("args    : ");
+        if (cmd->arr)
+        {
+            int i = 0;
+            while (cmd->arr[i])
+            {
+                printf("[%s] ", cmd->arr[i]);
+                i++;
+            }
+            printf("\n");
+        }
+        else
+            printf("NULL\n");
+
+        cmd = cmd->next;
+    }
+}

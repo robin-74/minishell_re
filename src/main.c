@@ -70,7 +70,20 @@ t_node *to_linked_list(char *input)
     }
     return head;
 }
+// void identify_quote_types(t_node *head)
+// {
+//     while(*head)
+//     {
+//         check_quote_type(head);
+//         head = head->next;
+//     }
+// }
+// void check_quote_type(t_node *node)
+// {
+//     if (!node || !node->token )
+//         return ;
 
+// }
 void check_type(t_node *node)
 {
     if (!node || !node->token)
@@ -89,6 +102,7 @@ void check_type(t_node *node)
     else
         node->type = ARG;
 }
+
 
 void identify_node_types(t_node *head)
 {
@@ -132,7 +146,7 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
 {
     t_cmd_node *temp = NULL;
     int prev_group = -1;
-    
+
     while (head)
     {
         if (head->group != prev_group)
@@ -140,12 +154,12 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
             t_cmd_node *new_cmd = init_cmd_node();
             if (!new_cmd)
                 return;
-            
+
             if (!*cmd_head)
                 *cmd_head = new_cmd;
             else
                 temp->next = new_cmd;
-            
+
             temp = new_cmd;
             temp->node_list = head;
             prev_group = head->group;
@@ -154,15 +168,83 @@ void group_by_group(t_cmd_node **cmd_head, t_node *head)
     }
 }
 
+void fill_herdock(t_cmd_node *cmd_head)
+{
+    while (cmd_head)
+    {
+        t_node *node = cmd_head->node_list;
+        int arg_count = 0;
+        t_node *tmp = node;
+        while (tmp)
+        {
+            if (tmp->type == ARG)
+                arg_count++;
+            tmp = tmp->next;
+        }
+
+        cmd_head->arr = malloc(sizeof(char *) * (arg_count + 1));
+        int i = 0;
+
+        while (node)
+        {
+            if (node->type == ARG)
+            {
+                cmd_head->arr[i++] = ft_strdup(node->token);
+            }
+            else if (node->type == RID_IN && node->next)
+            {
+                cmd_head->in = ft_strdup(node->next->token);
+                node = node->next;
+            }
+            else if (node->type == HERED && node->next)
+            {
+                cmd_head->heredoc = ft_strdup(node->next->token);
+                node = node->next;
+            }
+            else if (node->type == RID_OUT && node->next)
+            {
+                cmd_head->out = ft_strdup(node->next->token);
+                cmd_head->append = 0;
+                node = node->next;
+            }
+            else if (node->type == RED_APPEND && node->next)
+            {
+                cmd_head->out = ft_strdup(node->next->token);
+                cmd_head->append = 1;
+                node = node->next;
+            }
+            node = node->next;
+        }
+
+        cmd_head->arr[i] = NULL;
+        cmd_head = cmd_head->next;
+    }
+}
 
 
+
+void clean_node(t_node *head)
+{
+    t_node *tmp;
+    while (head)
+    {
+        tmp = head->next;
+        free(head->token);
+        free(head);
+        head = tmp;
+    }
+}
+ 
+
+ 
 int main(void)
 {
     char *input = NULL;
     size_t len = 0;
     ssize_t nr;
     int group = 0;
-
+    introo();
+    
     while (1)
     {
         printf("\nminishell>> ");
@@ -179,16 +261,17 @@ int main(void)
             free(input);
             input = NULL;
             continue;
-        }
+        }   
 
         t_node *head = to_linked_list(input);
         identify_node_types(head);
+        // identify_quote_types(head);
         assign_groups(head, group);
-        print_token_list(head);
         
         t_cmd_node *cmd_node = NULL;
         group_by_group(&cmd_node, head);
-        print_cmd_list(cmd_node);
+        fill_herdock(cmd_node);
+        clean_node(head);
         free(input);
         input = NULL;
     }

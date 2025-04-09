@@ -112,23 +112,43 @@ void identify_node_types(t_node *head)
         head = head->next;
     }
 }
-int check_quote_type(t_node *head)
-{
-    t_char_node *stack;
-    char *token = head->token;
-    fill_the_node(stack);
-    while(!is_empty(stack))
-    {
-        
-    }
 
+int check_quote_type(char *s)
+{
+    t_char_node *s = NULL;
+    char first_open = 0;
+    int i =0  ;
+    while(str[i])
+    {
+        if(str[i] = '\'' || str[i]= '""')
+        {
+            if (!is_empty[stack] && top_stack[stack] == str[i])
+                pop_stack(&stack);
+            else
+            {
+                push_stack(&stack, str[i]);
+                if (!first_open)
+                    first_open = str[i];
+            }
+        }
+        i++;
+    }
+    if (!is_empty(stack))
+        while (!is_empty(stack))
+            pop_stack(&stack);
+        return -1;
+    if (first_open == '\'')
+        return 1;
+    if (first_open == '""')
+        return 2;
+    return 0;
 }
 void idtfy_quotes_types(t_node *head)
 {
     int type ;
     while (head)
     {
-        type = check_quote_type(head);
+        type = check_quote_type(head->token);
         head->quotes_type = type;
         if (type == -1)
         {
@@ -330,7 +350,7 @@ int main(void)
         t_node *head = to_linked_list(input);
         identify_node_types(head);
         idtfy_quotes_types(head);
-        // identify_quote_types(head);
+      
         assign_groups(head, group);
         
         t_cmd_node *cmd_node = NULL;

@@ -1,27 +1,31 @@
+# Compiler and flags
 CC      = cc
 CFLAGS  = -Wall -Wextra -Werror
 
+# Directories
 SRC_DIR = src
 OBJ_DIR = obj
-INCLUDES = -I headers -I libft -I ft_printf
+INCLUDES = -I headers -I libft -I ft_printf -I stack
 
+# Libraries
 LIBFT   = libft/libft.a
 FTPRINTF = ft_printf/ft_printf.a
-STACK_DIR = stack
-STACK_LIB = $(STACK_DIR)/libstack.a
 
-SRCS    = $(wildcard $(SRC_DIR)/*.c)
-OBJS    = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+# Source and object files
+SRCS    = $(wildcard $(SRC_DIR)/*.c) stack/stack.c
+OBJS    = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
+# Final executable
 NAME    = minishell
 
+# Rules
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT) $(FTPRINTF) $(STACK_LIB)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(FTPRINTF) $(STACK_LIB) -o $(NAME)
+$(NAME): $(OBJS) $(LIBFT) $(FTPRINTF)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(FTPRINTF) -o $(NAME)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(OBJ_DIR)
+$(OBJ_DIR)/%.o: %.c
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 $(LIBFT):
@@ -30,20 +34,15 @@ $(LIBFT):
 $(FTPRINTF):
 	make -C ft_printf
 
-$(STACK_LIB):
-	make -C $(STACK_DIR)
-
 clean:
 	rm -rf $(OBJ_DIR)
 	make -C libft clean
 	make -C ft_printf clean
-	make -C $(STACK_DIR) clean
 
 fclean: clean
 	rm -f $(NAME)
 	make -C libft fclean
 	make -C ft_printf fclean
-	make -C $(STACK_DIR) fclean
 
 re: fclean all
 

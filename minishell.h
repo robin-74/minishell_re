@@ -1,5 +1,5 @@
 #include "ft_printf/ft_printf.h"
-#include "stack/push_swap.h"
+ 
 #include "libft/libft.h"
 #include "stack/stack.h"
 #include <stdlib.h>
@@ -77,7 +77,7 @@ typedef struct s_node {
 	int group;
 	t_token_type type;
    // t_quote_type quote_type;
-    int quote_type; // 0 if no quotes , 1 for ' and 2 for "" and  -1 if not closed  handel error 
+    int quotes_type; // 0 if no quotes , 1 for ' and 2 for "" and  -1 if not closed  handel error 
 	struct s_cmd_node *info_node;
 	struct s_node *next;
 }	t_node;
@@ -109,3 +109,4 @@ void intro(void);
 char	**ft_dup_matrix(char **matrix);
 void	ft_free_matrix(char ***matrix);
 void	free_list(t_node *head);
+ 

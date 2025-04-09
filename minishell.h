@@ -76,8 +76,8 @@ typedef struct s_node {
 	char *token;
 	int group;
 	t_token_type type;
-    t_quote_type quote_type;
-    int quotes_type; // 0 if no quotes , 1 for ' and 2 for "" and  -1 if not closed  handel error 
+   // t_quote_type quote_type;
+    int quote_type; // 0 if no quotes , 1 for ' and 2 for "" and  -1 if not closed  handel error 
 	struct s_cmd_node *info_node;
 	struct s_node *next;
 }	t_node;

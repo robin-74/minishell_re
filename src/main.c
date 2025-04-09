@@ -112,7 +112,32 @@ void identify_node_types(t_node *head)
         head = head->next;
     }
 }
+int check_quote_type(t_node *head)
+{
+    t_char_node *stack;
+    char *token = head->token;
+    fill_the_node(stack);
+    while(!is_empty(stack))
+    {
+        
+    }
 
+}
+void idtfy_quotes_types(t_node *head)
+{
+    int type ;
+    while (head)
+    {
+        type = check_quote_type(head);
+        head->quotes_type = type;
+        if (type == -1)
+        {
+            //handle error free everything throw error printf w keep the looping going 
+            printf("unclosed quotes  -1 andle cleaning .... \n");
+        }
+        head = head->next;
+    }
+}
 void assign_groups(t_node *head, int group)
 {
     int group_id = group;

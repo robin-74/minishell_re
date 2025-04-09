@@ -235,8 +235,47 @@ void clean_node(t_node *head)
     }
 }
  
+//kafter we connected o tthe  stack 
+//now we   will handle the herdock stuff using the stack  
+//to return a bool to e ahc node if we need to exp[end or not ]
+//  
+void init_node(t_nodee *stack_node)
+{
+    t_nodee	**sa;
+	t_nodee	**sb;
 
- 
+	validity_arg(argv, ac);
+	sa = malloc(sizeof(t_nodee *));
+	sb = malloc(sizeof(t_nodee *));
+	if (!sa || !sb)
+		return (1);
+	*sa = NULL;
+	*sb = NULL;
+	init(sa, ac, argv);
+	create_index(sa);
+	if (issorted(sa) == 1)
+	{
+		free_both(sa, sb);
+		exit(1);
+	}
+	if (stack_size(*sa) <= 5)
+		sort_small(sa, sb);
+	else
+		radix_sort(sa, sb);
+	free_both(sa, sb);
+}
+
+int handle_quotes(.....)
+{
+    t_nodee *stack;
+    //itterate over all tjhe node 
+    // check for  eacj token eza cj type tb3a ana fill with int or enum 0 1 3 -1  
+    //the parser take it and when parsing check if it need expend or throw error so on based on them     
+    //maybe the handle_quote should be  just after the elxing like befoer we do group by group nd so on  as we will assign for each token or i  can t do  this my cmd hold char **s how i would do it im confuosed idk  
+
+
+}
+
 int main(void)
 {
     char *input = NULL;
@@ -265,6 +304,7 @@ int main(void)
 
         t_node *head = to_linked_list(input);
         identify_node_types(head);
+        idtfy_quotes_types(head);
         // identify_quote_types(head);
         assign_groups(head, group);
         

@@ -126,18 +126,16 @@ char *read_heredoc(const char *limiter)
 {
     char *line = NULL;
     size_t len = 0;
-    char *result = NULL; // error: should be initialized with empty string
+    char *result = NULL; 
 
     while (1)
     {
         printf("> ");
-        if (getline(&line, &len, stdin) == 0) // logic error: should be == -1
-            break;
-        if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0)
-            break; // error: doesn’t check if it ends with \n
-        result = ft_strjoin(result, line); // error: memory leak if result not freed
+        if (getline(&line, &len, stdin) == 0) / 
+            break; 
+        result = ft_strjoin(result, line);  
     }
-    return result; // error: missing free for line
+    return result;  
 }
 
 void fill_herdock(t_cmd_node *cmd_head)
@@ -159,21 +157,7 @@ void fill_herdock(t_cmd_node *cmd_head)
         {
             if (node->type == ARG)
                 cmd_head->arr[i++] = ft_strdup(node->token);
-            else if (node->type == RID_IN && node->next)
-            {
-                cmd_head->in = ft_strdup(node->next->token);
-                node = node->next;
-            }
-            else if (node->type == HERED && node->next)
-            {
-                cmd_head->heredoc = read_heredoc(node->token); // error: should pass node->next->token
-                node = node->next;
-            }
-            else if (node->type == RID_OUT && node->next)
-            {
-                cmd_head->out = ft_strdup(node->next->token);
-                cmd_head->append = 0;
-                node = node->next;
+           
             }
             else if (node->type == RED_APPEND && node->next)
             {

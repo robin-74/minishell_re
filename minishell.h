@@ -1,7 +1,7 @@
 #include "ft_printf/ft_printf.h"
  
 #include "libft/libft.h"
-#include "stack/stack.h"
+// #include "stack/stack.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>

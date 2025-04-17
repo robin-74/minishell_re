@@ -5,14 +5,14 @@ CFLAGS  = -Wall -Wextra -Werror
 # Directories
 SRC_DIR = src
 OBJ_DIR = obj
-INCLUDES = -I headers -I libft -I ft_printf -I stack
+INCLUDES = -I headers -I libft -I ft_printf
 
 # Libraries
 LIBFT   = libft/libft.a
 FTPRINTF = ft_printf/ft_printf.a
 
 # Source and object files
-SRCS    = $(wildcard $(SRC_DIR)/*.c) stack/stack.c
+SRCS    = $(wildcard $(SRC_DIR)/*.c)
 OBJS    = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 # Final executable

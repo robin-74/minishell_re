@@ -1,72 +1,85 @@
 #include "../minishell.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
-int str_length(char *input)
+int ft_strlen_simple(char *str)
 {
     int i = 0;
-    while (input[i])
+    while (str[i])
         i++;
-    return i;
+    return (i);
 }
 
-t_node *init_new_node(int size_str, char *input, int start)
+t_node *new_token(int len, char *str, int start)
 {
     int i = 0;
-    char *token = malloc(size_str + 1);
+    char *token = malloc(len + 1);
+    t_node *node;
+
     if (!token)
-        return NULL;
-    while (i < size_str)
+        return (NULL);
+    while (i < len)
     {
-        token[i] = input[start + i];
+        token[i] = str[start + i];
         i++;
     }
     token[i] = '\0';
-    t_node *new_node = malloc(sizeof(t_node));
-    if (!new_node)
-    {
-        free(token);
-        return NULL;
-    }
-    new_node->token = token;
-    new_node->type = ARG;
-    new_node->group = 0;
-    new_node->quotes_type = 0;
-    new_node->info_node = NULL;
-    new_node->next = NULL;
-    return new_node;
+    node = malloc(sizeof(t_node));
+    if (!node)
+        return (free(token), NULL);
+    node->token = token;
+    node->type = ARG;
+    node->group = 0;
+    node->quotes_type = 0;
+    node->info_node = NULL;
+    node->next = NULL;
+    return (node);
 }
 
-t_node *to_linked_list(char *input)
+t_node *split_tokens(char *str)
 {
-    int n = str_length(input);
     int i = 0;
+    int len;
     t_node *head = NULL;
-    t_node *temp = NULL;
-    while (i < n)
+    t_node *curr = NULL;
+
+    while (str[i])
     {
-        while (input[i] == ' ' || input[i] == '\t')
+        while (str[i] == ' ' || str[i] == '\t')
             i++;
-        int len = 0;
-        while (input[i + len] && input[i + len] != ' ' && input[i + len] != '\t')
-            len++;
-        if (len > 0)
+        if (str[i] == '\0')
+            break;
+        if (str[i] == '\'' || str[i] == '"')
         {
-            t_node *new_node = init_new_node(len, input, i);
-            if (!new_node)
-                return NULL;
-            if (!head)
-                head = new_node;
-            else
-                temp->next = new_node;
-            temp = new_node;
-            i += len;
+            char quote = str[i];
+            int start = i++;
+            while (str[i] && str[i] != quote)
+                i++;
+            if (str[i] == quote)
+                i++;
+            len = i - start;
         }
         else
-            i++;
+        {
+            int start = i;
+            while (str[i] && str[i] != ' ' && str[i] != '\t' && str[i] != '\'' && str[i] != '"')
+                i++;
+            len = i - start;
+        }
+        t_node *new = new_token(len, str, i - len);
+        if (!new)
+            return (NULL);
+        if (!head)
+            head = new;
+        else
+            curr->next = new;
+        curr = new;
     }
-    return head;
+    return (head);
 }
 
-void check_type(t_node *node)
+void check_node_type(t_node *node)
 {
     if (!node || !node->token)
         return;
@@ -84,138 +97,159 @@ void check_type(t_node *node)
         node->type = ARG;
 }
 
-void identify_node_types(t_node *head)
+void set_node_types(t_node *head)
 {
     while (head)
     {
-        check_type(head);
+        check_node_type(head);
         head = head->next;
     }
 }
 
-void assign_groups(t_node *head, int group)
+void set_groups(t_node *head, int group)
 {
-    int group_id = group;
+    int grp = group;
+
     while (head)
     {
         if (head->type == TOKEN_PIPE)
-            group_id++;
-        head->group = group_id;
+            grp++;
+        head->group = grp;
         head = head->next;
     }
 }
 
-t_cmd_node *init_cmd_node()
+t_cmd_node *new_cmd(void)
 {
-    t_cmd_node *new_cmd = malloc(sizeof(t_cmd_node));
-    if (!new_cmd)
-        return NULL;
-    new_cmd->arr = NULL;
-    new_cmd->in = NULL;
-    new_cmd->out = NULL;
-    new_cmd->heredoc = NULL;
-    new_cmd->append = 0;
-    new_cmd->err = 0;
-    new_cmd->ex_heredoc = 0;
-    new_cmd->node_list = NULL;
-    new_cmd->next = NULL;
-    return new_cmd;
+    t_cmd_node *cmd = malloc(sizeof(t_cmd_node));
+    if (!cmd)
+        return (NULL);
+    cmd->arr = NULL;
+    cmd->in = NULL;
+    cmd->out = NULL;
+    cmd->heredoc = NULL;
+    cmd->append = 0;
+    cmd->err = 0;
+    cmd->ex_heredoc = 0;
+    cmd->node_list = NULL;
+    cmd->next = NULL;
+    return (cmd);
 }
 
-char *read_heredoc(const char *limiter)
+char *read_heredoc(const char *lim)
 {
     char *line = NULL;
     size_t len = 0;
-    char *result = NULL; 
+    ssize_t n;
+    char *res = NULL;
 
     while (1)
     {
         printf("> ");
-        if (getline(&line, &len, stdin) == 0) / 
-            break; 
-        result = ft_strjoin(result, line);  
+        n = ftgetline(&line, &len);
+        if (n <= 0)
+            break;
+        if (line[n - 1] == '\n')
+            line[n - 1] = '\0';
+        if (ft_strcmp(line, (char *)lim) == 0)
+            break;
+        res = ft_strjoin(res, line);
+        res = ft_strjoin(res, "\n");
     }
-    return result;  
+    free(line);
+    return (res);
 }
 
-void fill_herdock(t_cmd_node *cmd_head)
+void fill_cmd_arr(t_cmd_node *cmd)
 {
-    while (cmd_head)
+    while (cmd)
     {
-        t_node *node = cmd_head->node_list;
-        int arg_count = 0;
-        t_node *tmp = node;
+        t_node *cur = cmd->node_list;
+        int count = 0;
+        t_node *tmp = cur;
+
         while (tmp)
         {
             if (tmp->type == ARG)
-                arg_count++;
+                count++;
             tmp = tmp->next;
         }
-        cmd_head->arr = malloc(sizeof(char *) * (arg_count + 1));
+        cmd->arr = malloc(sizeof(char *) * (count + 1));
         int i = 0;
-        while (node)
+        while (cur)
         {
-            if (node->type == ARG)
-                cmd_head->arr[i++] = ft_strdup(node->token);
-           
-            }
-            else if (node->type == RED_APPEND && node->next)
+            if (cur->type == ARG)
+                cmd->arr[i++] = ft_strdup(cur->token);
+            else if (cur->type == RID_IN && cur->next)
             {
-                cmd_head->out = ft_strdup(node->next->token);
-                cmd_head->append = 1;
-                node = node->next;
+                cmd->in = ft_strdup(cur->next->token);
+                cur = cur->next;
             }
-            node = node->next;
+            else if (cur->type == RID_OUT && cur->next)
+            {
+                cmd->out = ft_strdup(cur->next->token);
+                cmd->append = 0;
+                cur = cur->next;
+            }
+            else if (cur->type == RED_APPEND && cur->next)
+            {
+                cmd->out = ft_strdup(cur->next->token);
+                cmd->append = 1;
+                cur = cur->next;
+            }
+            else if (cur->type == HERED && cur->next)
+            {
+                cmd->heredoc = read_heredoc(cur->next->token);
+                cur = cur->next;
+            }
+            cur = cur->next;
         }
-        cmd_head->arr[i] = NULL;
-        cmd_head = cmd_head->next;
+        cmd->arr[i] = NULL;
+        cmd = cmd->next;
     }
 }
 
-void group_by_group(t_cmd_node **cmd_head, t_node *head)
+void group_cmds(t_cmd_node **cmd, t_node *head)
 {
-    t_cmd_node *temp = NULL;
-    int prev_group = -1;
+    t_cmd_node *tmp = NULL;
+    int grp = -1;
+
     while (head)
     {
-        if (head->group != prev_group)
+        if (head->group != grp)
         {
-            t_cmd_node *new_cmd = init_cmd_node();
-            if (!new_cmd)
+            t_cmd_node *new = new_cmd();
+            if (!new)
                 return;
-            if (!*cmd_head)
-                *cmd_head = new_cmd;
+            if (!*cmd)
+                *cmd = new;
             else
-                temp->next = new_cmd;
-            temp = new_cmd;
-            temp->node_list = head;
-            prev_group = head->group;
+                tmp->next = new;
+            tmp = new;
+            tmp->node_list = head;
+            grp = head->group;
         }
         head = head->next;
     }
 }
 
-void print_cmd_nodes(t_cmd_node *cmd)
+void print_cmds(t_cmd_node *cmd)
 {
-    int i = 0;
+    int i;
+
     while (cmd)
     {
-        printf("🟩 New Command Group:\n");
-        printf("  ARGS: ");
+        printf("\n[Group]\n");
         if (cmd->arr)
         {
-            i = 0;
-            while (cmd->arr[i])
-                printf("[%s] ", cmd->arr[i++]);
+            for (i = 0; cmd->arr[i]; i++)
+                printf("arg[%d]: %s\n", i, cmd->arr[i]);
         }
-        printf("\n");
-        if (cmd->in)
-            printf("  IN   : %s\n", cmd->in);
-        if (cmd->out)
-            printf("  OUT  : %s (%s)\n", cmd->out, cmd->append ? "APPEND" : "TRUNC");
+        printf("in: %s\nout: %s\nappend: %d\n", cmd->in ? cmd->in : "(none)", cmd->out ? cmd->out : "(none)", cmd->append);
         if (cmd->heredoc)
-            printf("  HEREDOC:\n%s\n", cmd->heredoc);
-        printf("----------------------\n");
+            printf("heredoc:\n%s\n", cmd->heredoc);
+        else
+            printf("heredoc: (none)\n");
         cmd = cmd->next;
     }
 }
@@ -225,7 +259,7 @@ int main(void)
     char *input = NULL;
     size_t len = 0;
     ssize_t nr;
-    int group = 0;
+    int grp = 0;
 
     while (1)
     {
@@ -241,16 +275,15 @@ int main(void)
             input = NULL;
             continue;
         }
-        t_node *head = to_linked_list(input);
-        identify_node_types(head);
-        assign_groups(head, group);
-        t_cmd_node *cmd_node = NULL;
-        group_by_group(&cmd_node, head);
-        fill_herdock(cmd_node);
-        print_cmd_nodes(cmd_node);
-        //clean_node(head);
+        t_node *head = split_tokens(input);
+        set_node_types(head);
+        set_groups(head, grp);
+        t_cmd_node *cmd = NULL;
+        group_cmds(&cmd, head);
+        fill_cmd_arr(cmd);
+        print_cmds(cmd);
         free(input);
         input = NULL;
     }
-    return 0;
+    return (0);
 }

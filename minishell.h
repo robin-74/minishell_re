@@ -75,6 +75,7 @@ typedef enum e_token_type {
 typedef struct s_node {
 	char *token;
 	int group;
+    bool expand;
 	t_token_type type;
    // t_quote_type quote_type;
     int quotes_type; // 0 if no quotes , 1 for ' and 2 for "" and  -1 if not closed  handel error 
